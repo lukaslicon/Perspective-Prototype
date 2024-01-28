@@ -6,18 +6,23 @@ public class SimpleCharacterController : MonoBehaviour
     public float jumpForce = 10f;
     private CharacterController characterController;
     private Vector3 velocity;
+    private Animator animator;
+    float speed;
 
     void Start()
     {
         // Get the CharacterController component
         characterController = GetComponent<CharacterController>();
+        // Get the Animator component
+        animator = GetComponent<Animator>();
     }
 
     void Update()
     {
+
         // Get input from A and D keys
         float horizontalInput = Input.GetAxis("Horizontal");
-
+        speed = Mathf.Abs(horizontalInput);
         // Get the camera's right vector
         Transform cameraTransform = Camera.main.transform;
         Vector3 right = cameraTransform.right;
@@ -27,7 +32,6 @@ public class SimpleCharacterController : MonoBehaviour
 
         // Move the player using the CharacterController
         MovePlayer(movement);
-
         // Handle jumping
         if (Input.GetButtonDown("Jump"))
         {
@@ -52,6 +56,7 @@ public class SimpleCharacterController : MonoBehaviour
         // Apply the jump force if the player is grounded
         if (characterController.isGrounded)
         {
+            animator.Play("Jump");
             velocity.y = jumpForce;
         }
     }
@@ -67,9 +72,17 @@ public class SimpleCharacterController : MonoBehaviour
         {
             // If grounded, reset the vertical velocity
             velocity.y = -0.5f;
+            if(speed <= 0.0)
+            {
+                animator.Play("Idle");
+            }
+            else
+            {
+                animator.Play("RunFWD");
+            }
         }
-
         // Move the player vertically
         characterController.Move(velocity * Time.deltaTime);
     }
-}
+ }
+
